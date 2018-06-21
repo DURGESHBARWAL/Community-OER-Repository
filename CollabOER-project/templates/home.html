@@ -3,7 +3,7 @@
 <head>
 	<title>HomePage</title>
 </head>
-<body style="text-align:center; background-color: #AA8439">
+<body style="text-align:center; background-color: #ADD8E6">
 	<strong><h1 style="background-color: #FFE3AA"></h1>Django-DSpace System</strong>
 	<p style="background-color: #D4B16A">
 		
@@ -13,54 +13,51 @@
     <th>DSpace</th>
   </tr>
   <tr>
-    <td><a href="{% url 'test_get_communities' %}"><button>Get Communities</button></a></td>
-    <td><a href="{% url 'login' %}"><button>Log In</button></a></td>
+    <td><a href="{% url 'test_get_communities' %}"><button>T Get Communities</button></a></td>
+    <td><a href="{% url 'test_login' %}"><button>T Log In</button></a></td>
   </tr>
   <tr>
-    <td><a href="{% url 'get_community_resources' %}"><button>Get Resources From Communities</button></a></td>
-    <td><a href="{% url 'logout' %}"><button>Log Out</button></a></td>
+    <td><a href="{% url 'test_get_community_resources' %}"><button>T Get Resources From Communities</button></a></td>
+    <td><a href="{% url 'test_logout' %}"><button>T Log Out</button></a></td>
   </tr>
   <tr>
-    <td><a href="{% url 'get_groups' %}"><button>Get Groups</button></a></td>
-    <td><a href="{% url 'create-community' %}"><button>Create Community</button></a></td>
+    <td><a href="{% url 'test_get_groups' %}"><button>T Get Groups</button></a></td>
+    <td><a href="{% url 'test_create_collection' %}"><button>T Create Collection</button></a></td>
   </tr>
   <tr>
-    <td><a href="{% url 'get_group_resources' %}"><button>Get Resources From Group</button></a></td>
-    <td><a href="{% url 'create-sub-community' %}"><button>Create Sub Community</button></a></td>
-  </tr>
-  <tr>
-    <td> </td>
-    <td><a href="{% url 'test_create_collection' %}"><button>Create Collection</button></a></td>
+    <td><a href="{% url 'test_get_group_resources' %}"><button>T Get Resources From Group</button></a></td>
+    <td><a href="{% url 'test_create_sub_community' %}"><button>T Create Sub Community</button></a></td>
   </tr>
   <tr>
     <td> </td>
-    <td><a href="{% url 'add-items' %}"><button>Addition of Items</button></a></td>
+    <td><a href="{% url 'create_community' %}"><button>Create Community</button></a></td>
   </tr>
   <tr>
     <td> </td>
-    <td><a href="{% url 'add-bitstream' %}"><button>Addition of Bitstream</button></a></td>
+    <td><a href="{% url 'test_create_community_resources' %}"><button>Create Community Resources</button></a></td>
   </tr>
-				
+  				
 		
 
 	</table> 
-
+	
 	</p>
         {% if data %}
-	<hr>  	
+	<hr>  	<strong style="padding-right:100px;">Community Name</strong><strong>Community Category</strong><hr><br>
 		{% for community in data %}
-			{{ community.name }} || {{community.category}}<br>
+			<a style="padding-right:100px;">{{ community.name }}</a> {{community.category}}<br>
 		{% endfor %}
 	{% endif %}
 
 	{% if data1 %}
-  	<hr>
-		{% for community in data1 %}
-			{{ community.title }} || {{community.cname}}<br>
+  	<hr>    <strong style="padding-right:100px;">Resources Title</strong><strong>Resources Category</strong><hr><br>
+		{% for res in data1 %}
+			<a style="padding-right:100px;">{{ res.title }} </a> {{ res.cname }}<br>
 		{% endfor %}
 	{% endif %}
 
 	<hr>
+	<strong>Messages</strong>
 	{% if messages %}
            <ul class="messages">
                {% for message in messages %}
