@@ -29,14 +29,12 @@ urlpatterns = [
 	path('show/',views.test_login,name="test_login"),
 	path('show1/',views.test_logout,name="test_logout"),
 	
-	path('show3/',views.test_create_sub_community,name="test_create_sub_community"),
-	path('show4/',views.test_create_collection,name="test_create_collection"),
 	
 
 	
 	path('show2/',views.create_community,name="create_community"),
-	path('show5/',views.test_create_community_resources,name="test_create_community_resources"),
-
-	path('render/pdf/',views.Pdf.as_view()),
+	path('show5/',views.create_community_resources,name="create_community_resources"),
+	path('show6/',views.create_groups,name="create_groups"),
+	path('show7/',views.create_groups_resources,name="create_groups_resources"), 
     path('admin/', admin.site.urls),
 ]

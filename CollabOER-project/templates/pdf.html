@@ -35,9 +35,10 @@
     
             
                <h1> {{ title }} </h1>
-               <p><div style="font-size:1.9em;">Author: {{ created_by }}<br>
-               Community :  {{ cname }}</p></div>
-                <p class="date">{{ created_at }}</p><br><br>
+               <div style="font-size:1.7em;"><p>Author: {{ created_by }}<br>
+               Community :  {{ cname }}<br>
+		Published Date : {{ published_on }}</p></div>
+                <br><br>
                 <p>{{ body | linebreaks }}</p>
                 
     
