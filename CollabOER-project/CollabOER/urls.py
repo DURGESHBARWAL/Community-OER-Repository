@@ -18,10 +18,10 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-	path('',views.homepage,name="home"),
-	path('show1/',views.create_community,name="create_community"),
-	path('show2/',views.create_community_resources,name="create_community_resources"),
-	path('show3/',views.create_groups,name="create_groups"),
-	path('show4/',views.create_groups_resources,name="create_groups_resources"), 
+	path('',views.home_page,name="home_page"),
+	path('createcommunities/',views.create_community,name="create_community"),
+	path('createarticles/',views.create_community_resources,name="create_community_resources"),
+	path('creategroups/',views.create_groups,name="create_groups"),
+	path('creategrouparticles/',views.create_groups_resources,name="create_groups_resources"), 
     path('admin/', admin.site.urls),
 ]

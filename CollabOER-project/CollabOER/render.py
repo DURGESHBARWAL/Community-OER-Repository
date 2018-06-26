@@ -8,7 +8,7 @@ import os
 class Render:
 
     @staticmethod
-    def render(path: str, params: dict, filename, dirname):
+    def render(path: str, params: dict, filename, dirname=None):
         template = get_template(path)
         html = template.render(params)
         response = BytesIO()

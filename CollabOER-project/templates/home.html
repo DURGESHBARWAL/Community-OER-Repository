@@ -5,53 +5,11 @@
 </head>
 <body style="text-align:center; background-color: #ADD8E6">
 	<strong><h1 style="text-align:center; background-color: #FFFFFF">Django-DSpace System</h1></strong>
-	<p style="background-color: #D4B16A">		
-	 <table style="width:100%">
-  <tr>
-    <th>Django-DSpace</th>
-    
-  </tr>
-  <tr>
-    <td><a href="{% url 'create_community' %}"><button id ="create_community">Create Community</button></a></td>
-    
-  </tr>
-  <tr>
-    <td><a href="{% url 'create_community_resources' %}"><button id="create_c_resources">Create Community Resources</button></a></td>
-    
-  </tr>
-  <tr>
-    <td><a href="{% url 'create_groups' %}"><button  id="create_groups">Create Groups</button></a></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td><a href="{% url 'create_groups_resources' %}"><button id="create_g_resources">Create Groups Resources</button></a></td>
-    
-  </tr>
-  	</table> 
-	</p>
-        {% if data %}
-	<hr>  	<strong style="padding-right:100px;">Community Name</strong><strong>Community Category</strong><hr><br>
-		{% for community in data %}
-			<a style="padding-right:100px;">{{ community.name }}</a> {{community.category}}<br>
-		{% endfor %}
-	{% endif %}
-
-	{% if data1 %}
-  	<hr>    <strong style="padding-right:100px;">Resources Title</strong><strong>Resources Category</strong><hr><br>
-		{% for res in data1 %}
-			<a style="padding-right:100px;">{{ res.title }} </a> {{ res.communityname }}<br>
-		{% endfor %}
-	{% endif %}
-	<hr>
-	<h2  style="text-align:center;"><strong>Messages</strong></h2>
-	{% if messages %}
-           <ul class="messages">
-               {% for message in messages %}
-               <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-               {% endfor %}
-           </ul>
-        {% endif %}
-	<p>{{mess}}</p>
-	<br>
+	 
+    	<br><br>
+  	<a href="{% url 'create_community' %}"><button id ="create_community">Create Community</button></a>
+    	<br>
+    	
+	
 </body> 
 </html>

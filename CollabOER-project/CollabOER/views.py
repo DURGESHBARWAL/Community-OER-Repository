@@ -11,7 +11,7 @@ from decimal import Decimal
 import requests
 
 
-def homepage(request):
+def home_page(request):
 	return render(request,'home.html')
 
 ##################################Main Functions
@@ -20,11 +20,10 @@ def get_communities(request):
 	r = requests.get('http://localhost:8000/api/dspace/communityapi/')	
 	data = r.json()
 	if (r.status_code==200 and data):	
-		messages.success(request, 'Successfully Fetched all Communities from Collaboration System')
 		return data
 	elif r.status_code==200:
 		messages.success(request, 'No Communities to Fetch from Collaboration System')
-		return 0
+		return 1
 	else:
 		messages.error(request, 'Error in Fetching the Communities from Collaboration System')
 		return 0
@@ -35,13 +34,10 @@ def get_community_resources(request):
 	
 	data = r.json()
 	if (r.status_code==200 and data):	
-		messages.success(request, 'Successfully Fetched all Resources of Communities from Collaboration System')
 		return data
 	elif r.status_code==200:
-		messages.success(request, 'No Resources to Fetch from Collaboration System')
-		return 0
+		return 1
 	else: 		
-		messages.error(request, 'Error in Fetching the Resources of Communities from Collaboration System')
 		return 0
 
 
@@ -49,26 +45,20 @@ def get_groups(request):
 	r = requests.get('http://localhost:8000/api/dspace/groupapi/')	
 	data = r.json()
 	if (r.status_code==200  and data):	
-		messages.success(request, 'Successfully Fetched all Groups of Communities from Collaboration System')
 		return data
 	elif r.status_code==200:
-		messages.success(request, 'No Groups to Fetch from Collaboration System')
-		return 0
+		return 1
 	else:
-		messages.error(request, 'Error in Fetching Groups of Communities from Collaboration System')
 		return 0
 
 def get_groups_resources(request):
 	r = requests.get('http://localhost:8000/api/dspace/grouparticlesapi/')	
 	data = r.json()
 	if (r.status_code==200 and data):	
-		messages.success(request, 'Successfully Fetched all Resources of Group from Collaboration System')
 		return data
 	elif r.status_code==200:
-		messages.success(request, 'No Resources of Group to Fetch from Collaboration System')
-		return 0		
+		return 1		
 	else:
-		messages.error(request, 'Error in Fetching Groups Resources of Group from Collaboration System')
 		return 0
 
 
@@ -79,52 +69,68 @@ def login(request):
 	r = requests.post(url, data=head)
 	sessionid = r.cookies['JSESSIONID']
 	if r.status_code==200:
-		messages.success(request, 'User Successfully Logged in to the DSpace System')
 		return sessionid
 	else:
-		messages.error(request, 'Error in Login to DSpace System')
 		return 500
 
 def logout(request):
 	url = 'http://127.0.0.1:80/rest/logout'
 	r = requests.post(url)
 	if r.status_code==200:
-		messages.success(request, 'User Successfully Logged out from the DSpace System.')
 		return 1
 	else:
-		message.error(request, 'Error in Logout from DSpace System')
 		return 0
 
 
 def create_community(request):        
 	data=get_communities(request)
-	if data!=0:	
+	if data!=0 or data!=1:
+		message="Fetched --->"	
 		#login funcion calling
 		sessionid = login(request)
 		if sessionid != 500:
-			#User Successfully Login to the System
+			message+="Login --->"
 			#Community POST
 			url = 'http://127.0.0.1:80/rest/communities'
 			head = {'Content-Type': 'application/json'}
 			jar = requests.cookies.RequestsCookieJar()
 			jar.set('JSESSIONID', sessionid, domain='127.0.0.1', path='/rest/communities')
 			k=100
+			count=0
+			count_community=0;count_collection=0
 			for name in data:
-				while(k==100):
-					community={"name": name['name'], "copyrightText": "", "introductoryText": name['category'], "shortDescription": name['desc'], "sidebarText": ""}
-					r = requests.post(url, headers=head, json=community, cookies = jar)
-					if r.status_code==200:
-						messages.success(request, 'Community is Created Successfully')
-						create_collection(request,name['name'],community,jar,0)        
-						k=200
-					else: 
-						k=100				
-						messages.error(request, 'Error in Community Creation')
-				k=100
+				count=count+1
+				community={"name": name['name'], "copyrightText": "", "introductoryText": name['category'], "shortDescription": name['desc'], "sidebarText": ""}
+				
+				r = requests.post(url, headers=head, json=community, cookies = jar)
+				if r.status_code==200:
+					count_community = count_community + 1
+					flag = create_collection(request,name['name'],community,jar,0)
+					count_collection = count_collection + flag        
+				else: 
+					message += "Error in Community Creation --->" 
+			message = str(count)+ " Communities " + message + " "+ str(count_community) + " Communties Created in DSpace" + " ---> " + str(count_collection) + " Collection is Created in DSpace "
+			if count_community == count_collection:
+				success_flag=1
+			else: 
+				success_flag=0	
+		else:
+			message="DSpace Login Failed"
+			success_flag=0		
 		if sessionid!=500:
 			#logout
-			logout(request)		
-	return render(request,'home.html')
+			if logout(request)==1:
+			    message+="---> Logout"
+			else:
+			    message+="--> Error in Logout"    
+	elif data==1:
+		message="No Communities to Fetch"
+		success_flag=1
+	else:
+		message="Error to Connect with Collaboration System"
+		success_flag=0			
+	content = {'msg': message, 'success_flag': success_flag}				
+	return render(request,'home1.html', content)
 
 
 def create_collection(request, collection, community, jar, k):
@@ -140,17 +146,15 @@ def create_collection(request, collection, community, jar, k):
 	for i in r.json():
 		if community_name==i['name']:
 			uuid=i['uuid']
-			exit			
-	
+			exit				
 	#Creation of Collection
 	url = 'http://127.0.0.1:80/rest/communities/' + uuid + '/collections'
 	head = {'Content-Type': 'application/json'}
-		
 	r = requests.post(url, headers=head, json=community, cookies = jar)
 	if r.status_code==200:
-		messages.success(request, 'Collection is Created Successfully in DSpace')
+		return 1
 	else: 
-		messages.error(request, 'Error in Collection Creation in DSpace')
+		return 0
 
 
 
@@ -159,24 +163,29 @@ def create_collection(request, collection, community, jar, k):
 
 def create_community_resources(request):
 	data=get_community_resources(request)
-	if data!=0: 
+	if data!=0 or data!=1:
+		message="Fetched --->"	
 		#login funcion calling
 		sessionid = login(request)
 		if sessionid != 500:
+			message+="Login --->"
 			#Getting of all Collections
 			url = 'http://127.0.0.1:80/rest/collections'
 			r = requests.get(url, headers = {'Content-Type': 'application/json'})
-			for name in data:			        
+			count=0
+			count_item=0;count_bitstream=0
+			for name in data:
+				count=count+1
 				#Getting the uuid of a collection
 				collection_name = name['communityname']
 				for i in r.json():
 					if collection_name and i['name']:
 						uuid=i['uuid']
 						exit
+				
 				#Addition of an item in a collection
-				if uuid != 0:	
-					url = 'http://127.0.0.1:80/rest/collections/' + uuid + '/items'
-					item = {"metadata":[
+				url = 'http://127.0.0.1:80/rest/collections/' + uuid + '/items'
+				item = {"metadata":[
 			{
 			"key": "dc.contributor.author",
 			"value": name['created_by']
@@ -196,30 +205,50 @@ def create_community_resources(request):
 			"value": "Collaboration System",
 			"language": "en_US"
 			}]}
-					jar = requests.cookies.RequestsCookieJar()
-					jar.set('JSESSIONID', sessionid, domain='127.0.0.1', path='/rest/collections')
-					response = requests.post(url, headers={'Content-Type': 'application/json'}, json=item, cookies = jar)
-					if response.status_code==200:
-						messages.success(request, 'Item is Created Successfully in DSpace')
-						create_bitstream(request, name['title'], name, sessionid)
-					else: 
-						messages.error(request, 'Error in Item and File POSTing to DSpace')	
+				jar = requests.cookies.RequestsCookieJar()
+				jar.set('JSESSIONID', sessionid, domain='127.0.0.1', path='/rest/collections')
+				response = requests.post(url, headers={'Content-Type': 'application/json'}, json=item, cookies = jar)
+				if response.status_code==200:
+					count_item = count_item + 1
+					flag = create_bitstream(request, name['title'], name, sessionid)
+					count_bitstream = count_bitstream + flag        
+				else: 
+					message += "Error in Item and File Creation"
+			message = str(count)+ " Articles " + message + " "+ str(count_item) + " Items Created in DSpace" + " ---> " + str(count_bitstream) + " Bitstream is Created in DSpace "
+			if count_item == count_bitstream:
+				success_flag=1
+			else: 
+				success_flag=0		
+		else:
+			message="---> Login Failed"
+			success_flag=0		
 		if sessionid!=500:
 			#logout
-			logout(request)		
-	return render(request,'home.html')
+			if logout(request)==1:
+			    message+="---> Logout"
+			else:
+			    message+="--> Error in Logout"		
+	elif data==1:
+		message="No Communities Resources to Fetch"
+		success_flag=1
+	else:
+		message="Error to Connect with Collaboration System"
+		success_flag=0			
+	content = {'msg': message, 'success_flag': success_flag}				
+	return render(request,'home2.html', content)
+
 
 
 def create_bitstream(request, title, name, sessionid):	
 	
 	#Getting of all Items
 	url = 'http://127.0.0.1:80/rest/items'
-	rs = requests.get(url, headers={'Content-Type': 'application/json'})
+	res = requests.get(url, headers={'Content-Type': 'application/json'})
         
 	
 	#Getting the uuid of a Item
 	item_name=title
-	for i in rs.json():
+	for i in res.json():
 		if (item_name and i['name']):
 			uuid=i['uuid']
 			exit
@@ -233,17 +262,17 @@ def create_bitstream(request, title, name, sessionid):
 	jar.set('JSESSIONID', sessionid, domain='127.0.0.1', path='/rest/items')
 				
 	temp = getpdf(request, name)
-	files = {'file': open('Files/temp'+ str(name['articleid']) +'.pdf', 'rb')}
+	files = {'file': open('Files/community'+ str(name['articleid']) +'.pdf', 'rb')}
 	
 	res = requests.post(url, files=files, headers={'Content-Type': 'application/json'}, params=data, cookies = jar)
 	if res.status_code==200:
-		messages.success(request, 'File is Inserted Successfully')
+		return 1
 	else: 
-		messages.error(request, 'Error in File Insertion Creation')
+		return 0
 
 
 def getpdf(request, name):
-		filename = "temp"+str(name['articleid'])+".pdf"
+		filename = "community"+str(name['articleid'])+".pdf"
 		params = {
 			'title': name['title'],
 			'body' : name['body'],
@@ -254,52 +283,92 @@ def getpdf(request, name):
 		x = Render.render('pdf.html',params, filename, name['communityname'])
 		return x
 
+
+
+
+
+
+
 	
 				############# GROUPS ###########################
 def create_groups(request):
 	data=get_groups(request)
-	if data!=0:
+	if data!=0 or data!=1:
+		message="Fetched --->"	
 		#login funcion calling
 		sessionid = login(request)
 		if sessionid != 500:
+			message+="Login --->"
 			#Getting of all Communities
 			url = 'http://127.0.0.1:80/rest/communities/top-communities'
 			r = requests.get(url, headers = {'Content-Type': 'application/json'})
+			count=0
+			count_community=0;count_collection=0
 			for group in data:
+				count=count+1
 				#Getting the uuid of a community
 				community_name = group['community_name'] 
 				for i in r.json():
-					if community_name==i['name']:
+					if community_name  and i['name']:
 						uuid=i['uuid']
 						exit
-				if uuid:
-					url = 'http://127.0.0.1:80/rest/communities/' + uuid + '/communities'
-					jar = requests.cookies.RequestsCookieJar()
-					jar.set('JSESSIONID', sessionid, domain='127.0.0.1', path='/rest/communities')
-					content={ "name": group['name'], "copyrightText": "", "introductoryText": "", "shortDescription": group['desc'], "sidebarText": ""}
-					re = requests.post(url,headers={'Content-Type':'application/json'},json=content,cookies= jar)			
-					if re.status_code==200:
-						messages.success(request, 'Group is Created in DSpace')
-						create_collection(request, group['community_name'], content, jar, 1)
-					else: 
-						messages.error(request, 'Error in Group Creation in DSpace')
+				url = 'http://127.0.0.1:80/rest/communities/' + uuid + '/communities'
+				head = {'Content-Type':'application/json'} 
+				jar = requests.cookies.RequestsCookieJar()
+				jar.set('JSESSIONID', sessionid, domain='127.0.0.1', path='/rest/communities')
+				content1={ "name": group['name'], "copyrightText": "", "introductoryText": "", "shortDescription": group['desc'], "sidebarText": ""}
+				re = requests.post(url,headers = head,json = content1, cookies = jar)			
+				if re.status_code==200:
+					count_community = count_community + 1
+					flag = create_collection(request, group['community_name'], content1, jar, 1)
+					count_collection = count_collection + flag        
+				else: 
+					message += "Error in Sub Community Creation --->" 
+			message = str(count)+ " Groups " + message + " "+ str(count_community) + " Sub Communties Created in DSpace" + " ---> " + str(count_collection) + " Collection is Created in DSpace "
+			if count_community == count_collection:
+				success_flag=1
+			else: 
+				success_flag=0
+					
+					
+		else:
+			message="---> Login Failed"
+			success_flag=0		
 		if sessionid!=500:
 			#logout
-			logout(request)		
-	return render(request,'home.html')
+			if logout(request)==1:
+			    message+="---> Logout"
+			else:
+			    message+="--> Error in Logout"		
+	elif data==1:
+		message="No Groups to Fetch"
+		success_flag=1
+	else:
+		message="Error to Connect with Collaboration System"
+		success_flag=0			
+	content = {'msg': message, 'success_flag': success_flag}				
+	return render(request,'home3.html', content)
 
 
 				################# GROUPS RESOURCES #########################
 def create_groups_resources(request):
+		
+	
+	
 	data=get_groups_resources(request)
-	if data!=0: 
+	if data!=0 or data!=1: 
+		message="Fetched --->"	
 		#login funcion calling
 		sessionid = login(request)
 		if sessionid != 500:
+			message+="Login --->"
 			#Getting of all Collections
 			url = 'http://127.0.0.1:80/rest/collections'
 			r = requests.get(url, headers = {'Content-Type': 'application/json'})
+			count=0
+			count_item=0;count_bitstream=0
 			for name in data:			        
+				count = count + 1
 				#Getting the uuid of a collection
 				collection_name = name['groupname']
 				for i in r.json():
@@ -307,9 +376,8 @@ def create_groups_resources(request):
 						uuid=i['uuid']
 						exit
 				#Addition of an item in a collection
-				if uuid != 0:	
-					url = 'http://127.0.0.1:80/rest/collections/' + uuid + '/items'
-					item = {"metadata":[
+				url = 'http://127.0.0.1:80/rest/collections/' + uuid + '/items'
+				item = {"metadata":[
 			{
 			"key": "dc.contributor.author",
 			"value": name['created_by']
@@ -329,18 +397,35 @@ def create_groups_resources(request):
 			"value": "Collaboration System",
 			"language": "en_US"
 			}]}
-					jar = requests.cookies.RequestsCookieJar()
-					jar.set('JSESSIONID', sessionid, domain='127.0.0.1', path='/rest/collections')
-					req = requests.post(url, headers={'Content-Type': 'application/json'}, json=item, cookies = jar)
-					if req.status_code==200:
-						messages.success(request, 'Item is Created Successfully in DSpace')
-						create_group_bitstream(request, name['title'], name, sessionid)
-					else: 
-						messages.error(request, 'Error in Item and File POSTing to DSpace')	
+				jar = requests.cookies.RequestsCookieJar()
+				jar.set('JSESSIONID', sessionid, domain='127.0.0.1', path='/rest/collections')
+				req = requests.post(url, headers={'Content-Type': 'application/json'}, json=item, cookies = jar)
+				if req.status_code==200:
+					count_item = count_item + 1
+					flag =create_group_bitstream(request, name['title'], name, sessionid)
+					count_bitstream = count_bitstream + flag 
+				else: 
+					message += "Error in Item and File Creation"
+			message = str(count)+ " Articles " + message + " "+ str(count_item) + " Items Created in DSpace" + " ---> " + str(count_bitstream) + " Bitstream is Created in DSpace "
+			if count_item == count_bitstream:
+				success_flag=1
+			else: 
+				success_flag=0	
 		if sessionid!=500:
 			#logout
-			logout(request)		
-	return render(request,'home.html')
+			if logout(request)==1:
+			    message+="---> Logout"
+			else:
+			    message+="--> Error in Logout"		
+	elif data==1:
+		message="No Group Resources to Fetch"
+		success_flag=1
+	else:
+		message="Error to Connect with Collaboration System"
+		success_flag=0			
+	content = {'msg': message, 'success_flag': success_flag}				
+	return render(request,'home4.html', content)
+
 
 def create_group_bitstream(request, title, name, sessionid):	
 	
@@ -369,9 +454,9 @@ def create_group_bitstream(request, title, name, sessionid):
 	
 	response = requests.post(url, files=files, headers={'Content-Type': 'application/json'}, params=data, cookies = jar)
 	if response.status_code==200:
-		messages.success(request, 'File is Inserted Successfully')
+		return 1
 	else: 
-		messages.error(request, 'Error in File Insertion Creation')
+		return 0
 
 
 def get_grouparticle_pdf(request, name):

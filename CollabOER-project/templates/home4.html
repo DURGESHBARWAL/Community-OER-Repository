@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	<title>Django-DSpace System</title>
+</head>
+<body style="text-align:center; background-color: #ADD8E6">
+	<strong><h1 style="text-align:center; background-color: #FFFFFF">Django-DSpace System</h1></strong>
+	<br><br>
+	
+    	<a href="{% url 'home_page' %}"><button id="home_button"> Home Page </button></a></td>
+  	<br>
+  	<hr>
+  	<h2>Message</h2>
+  	{% if msg %}
+  		<p> {{ msg }}</p><br>
+  		 {% if success_flag %}
+  		 	<p><strong>Status:</strong> Successfull Execution</p>
+  		 {% else %}
+  		 	<p><strong>Status:</strong>Unsuccessfull Execution</p>
+  		 {% endif %}		
+	
+	{% endif %}
+	<br>
+	
+</body> 
+</html>
