@@ -3,34 +3,29 @@
 <head>
 	<title>Django-DSpace System</title>
 </head>
-<body style="background-color: #ADD8E6">
+<body style="text-align:center; background-color: #ADD8E6">
 	<strong><h1 style="text-align:center; background-color: #FFFFFF">Django-DSpace System</h1></strong>
 	<p style="background-color: #D4B16A">		
 	 <table style="width:100%">
   <tr>
-    <th>Test Collaboration System</th>
     <th>Django-DSpace</th>
-    <th>Test DSpace System</th>
+    
   </tr>
   <tr>
-    <td><a href="{% url 'test_get_communities' %}"><button>Get Communities</button></a></td>
-    <td><a href="{% url 'create_community' %}"><button>Create Community</button></a></td>
-    <td><a href="{% url 'test_login' %}"><button>Log In to DSpace</button></a></td>
+    <td><a href="{% url 'create_community' %}"><button id ="create_community">Create Community</button></a></td>
+    
   </tr>
   <tr>
-    <td><a href="{% url 'test_get_community_resources' %}"><button>Get Resources From Communities</button></a></td>
-    <td><a href="{% url 'create_community_resources' %}"><button>Create Community Resources</button></a></td>
-    <td><a href="{% url 'test_logout' %}"><button>Log Out to DSpace</button></a></td>
+    <td><a href="{% url 'create_community_resources' %}"><button id="create_c_resources">Create Community Resources</button></a></td>
+    
   </tr>
   <tr>
-    <td><a href="{% url 'test_get_groups' %}"><button>Get Groups</button></a> </td>
-    <td><a href="{% url 'create_groups' %}"><button>Create Groups</button></a></td>
+    <td><a href="{% url 'create_groups' %}"><button  id="create_groups">Create Groups</button></a></td>
     <td></td>
   </tr>
   <tr>
-    <td><a href="{% url 'test_get_group_resources' %}"><button>Get Resources From Group</button></a> </td>
-    <td><a href="{% url 'create_groups_resources' %}"><button>Create Groups Resources</button></a></td>
-    <td></td>
+    <td><a href="{% url 'create_groups_resources' %}"><button id="create_g_resources">Create Groups Resources</button></a></td>
+    
   </tr>
   	</table> 
 	</p>
@@ -48,7 +43,7 @@
 		{% endfor %}
 	{% endif %}
 	<hr>
-	<strong>Messages</strong>
+	<h2  style="text-align:center;"><strong>Messages</strong></h2>
 	{% if messages %}
            <ul class="messages">
                {% for message in messages %}
