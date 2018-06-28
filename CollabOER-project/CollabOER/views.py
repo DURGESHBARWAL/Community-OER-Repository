@@ -22,10 +22,8 @@ def get_communities(request):
 	if (r.status_code==200 and data):	
 		return data
 	elif r.status_code==200:
-		messages.success(request, 'No Communities to Fetch from Collaboration System')
 		return 1
 	else:
-		messages.error(request, 'Error in Fetching the Communities from Collaboration System')
 		return 0
 
 
@@ -84,7 +82,7 @@ def logout(request):
 
 def create_community(request):        
 	data=get_communities(request)
-	if data!=0 or data!=1:
+	if data!=0 and data!=1:
 		message="Fetched --->"	
 		#login funcion calling
 		sessionid = login(request)
@@ -105,7 +103,7 @@ def create_community(request):
 				r = requests.post(url, headers=head, json=community, cookies = jar)
 				if r.status_code==200:
 					count_community = count_community + 1
-					flag = create_collection(request,name['name'],community,jar,0)
+					flag = create_collection(request, name['name'], community,jar,0)
 					count_collection = count_collection + flag        
 				else: 
 					message += "Error in Community Creation --->" 
@@ -134,28 +132,28 @@ def create_community(request):
 
 
 def create_collection(request, collection, community, jar, k):
-	#Getting of all Communities
+	#Getting all Communities
 	if k==0:	
 		url = 'http://127.0.0.1:80/rest/communities/top-communities'
 	else:
 		url = 'http://127.0.0.1:80/rest/communities'		
-	r = requests.get(url, headers = {'Content-Type': 'application/json'})
+	res1 = requests.get(url, headers = {'Content-Type': 'application/json'})
         
 	#Getting the uuid of a community
 	community_name = collection
-	for i in r.json():
-		if community_name==i['name']:
+	for i in res1.json():
+		if community_name == i['name']:
 			uuid=i['uuid']
 			exit				
-	#Creation of Collection
+	
 	url = 'http://127.0.0.1:80/rest/communities/' + uuid + '/collections'
 	head = {'Content-Type': 'application/json'}
-	r = requests.post(url, headers=head, json=community, cookies = jar)
-	if r.status_code==200:
+	res2 = requests.post(url, headers=head, json=community, cookies = jar)
+	if res2.status_code==200:
 		return 1
 	else: 
 		return 0
-
+	
 
 
 				################## Community Articles ################
@@ -163,7 +161,7 @@ def create_collection(request, collection, community, jar, k):
 
 def create_community_resources(request):
 	data=get_community_resources(request)
-	if data!=0 or data!=1:
+	if data!=0 and data!=1:
 		message="Fetched --->"	
 		#login funcion calling
 		sessionid = login(request)
@@ -179,7 +177,7 @@ def create_community_resources(request):
 				#Getting the uuid of a collection
 				collection_name = name['communityname']
 				for i in r.json():
-					if collection_name and i['name']:
+					if collection_name == i['name']:
 						uuid=i['uuid']
 						exit
 				
@@ -249,7 +247,7 @@ def create_bitstream(request, title, name, sessionid):
 	#Getting the uuid of a Item
 	item_name=title
 	for i in res.json():
-		if (item_name and i['name']):
+		if (item_name == i['name']):
 			uuid=i['uuid']
 			exit
 
@@ -293,7 +291,7 @@ def getpdf(request, name):
 				############# GROUPS ###########################
 def create_groups(request):
 	data=get_groups(request)
-	if data!=0 or data!=1:
+	if data!=0 and data!=1:
 		message="Fetched --->"	
 		#login funcion calling
 		sessionid = login(request)
@@ -309,7 +307,7 @@ def create_groups(request):
 				#Getting the uuid of a community
 				community_name = group['community_name'] 
 				for i in r.json():
-					if community_name  and i['name']:
+					if community_name  == i['name']:
 						uuid=i['uuid']
 						exit
 				url = 'http://127.0.0.1:80/rest/communities/' + uuid + '/communities'
@@ -356,7 +354,7 @@ def create_groups_resources(request):
 	
 	
 	data=get_groups_resources(request)
-	if data!=0 or data!=1: 
+	if data!=0 and data!=1: 
 		message="Fetched --->"	
 		#login funcion calling
 		sessionid = login(request)
@@ -437,7 +435,7 @@ def create_group_bitstream(request, title, name, sessionid):
 	#Getting the uuid of a Item
 	item_name=title
 	for i in req1.json():
-		if (item_name and i['name']):
+		if (item_name == i['name']):
 			uuid=i['uuid']
 			exit
 
