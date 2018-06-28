@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8001"
+    volumes:
+      - .:/djangodspace
+    ports:
+      - "8001:8001"
+    
